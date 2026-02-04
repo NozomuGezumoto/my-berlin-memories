@@ -3,6 +3,13 @@
 // Build with: CITY=kyoto npx expo start
 // ============================================
 
+// EAS Project IDs for each city (separate apps in App Store Connect / Play Console)
+const CITY_EAS_PROJECT_IDS = {
+  kyoto: 'be8cf4b8-2805-49b0-bf67-c791a8dfcf52', // My Kyoto - already in review
+  paris: '01360b68-1eb7-40be-b344-40a2e69a8522', // My Paris - separate project
+  // Add other cities as needed
+};
+
 // City configurations (simplified for app.config.js - full config in src/config)
 const CITY_APP_CONFIG = {
   kyoto: {
@@ -133,7 +140,14 @@ export default {
       city: cityId,
       cityName: cityConfig.name,
       cityNameJa: cityConfig.nameJa,
+      // Set EAS projectId based on current city (required for EAS builds)
+      eas: {
+        projectId: CITY_EAS_PROJECT_IDS[cityId] || CITY_EAS_PROJECT_IDS.kyoto,
+      },
     },
+
+    // Owner for EAS projects
+    owner: 'nozomusp',
 
     ios: {
       supportsTablet: true,

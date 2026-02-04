@@ -4,18 +4,18 @@
 // Using react-native-maps with clustering
 // ============================================
 
-import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text, Pressable } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
-import ClusteredMapView from 'react-native-map-clustering';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import ClusteredMapView from 'react-native-map-clustering';
+import MapView, { Marker } from 'react-native-maps';
 import {
-  CITY_INITIAL_REGION,
-  CITY_THEME_COLORS,
-  CITY_PIN_SIZE,
-  CITY_SPACING,
-  CITY_RADIUS,
-  CITY_SHADOWS,
+    CITY_INITIAL_REGION,
+    CITY_PIN_SIZE,
+    CITY_RADIUS,
+    CITY_SHADOWS,
+    CITY_SPACING,
+    CITY_THEME_COLORS,
 } from '../../constants/city-theme';
 import { useStore } from '../../store/useStore';
 import { MemoryPin } from '../../types';
@@ -199,30 +199,40 @@ export default function CityMap({
           
           return (
             <Marker
-              key={pin.id}
+              key={`${pin.id}-${displayMode}`}
               coordinate={{
                 latitude: pin.lat,
                 longitude: pin.lng,
               }}
+              anchor={{ x: 0.5, y: 1.0 }}
               onPress={() => handleMarkerPress(pin)}
               tracksViewChanges={false}
             >
               {showPhoto ? (
                 hasPhoto ? (
-                  <View style={[styles.photoMarker, { borderColor: rankBorderColor }]}>
-                    <Image
-                      source={{ uri: pin.photoUri }}
-                      style={styles.photoImage}
-                    />
+                  <View style={styles.markerContainer}>
+                    <View style={[styles.photoMarker, { borderColor: rankBorderColor }]}>
+                      <Image
+                        source={{ uri: pin.photoUri }}
+                        style={styles.photoImage}
+                      />
+                    </View>
+                    <View style={[styles.photoPointer, { borderTopColor: rankBorderColor }]} />
                   </View>
                 ) : (
-                  <View style={[styles.nullMarker, { borderColor: rankBorderColor }]}>
-                    <Text style={styles.nullChar}>N</Text>
+                  <View style={styles.markerContainer}>
+                    <View style={[styles.nullMarker, { borderColor: rankBorderColor }]}>
+                      <Text style={styles.nullChar}>N</Text>
+                    </View>
+                    <View style={[styles.textPointer, { borderTopColor: rankBorderColor }]} />
                   </View>
                 )
               ) : (
-                <View style={[styles.textMarker, { borderColor: rankBorderColor }]}>
-                  <Text style={styles.textChar}>{pin.textChar || '?'}</Text>
+                <View style={styles.markerContainer}>
+                  <View style={[styles.textMarker, { borderColor: rankBorderColor }]}>
+                    <Text style={styles.textChar}>{pin.textChar || '?'}</Text>
+                  </View>
+                  <View style={[styles.textPointer, { borderTopColor: rankBorderColor }]} />
                 </View>
               )}
             </Marker>
@@ -316,6 +326,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: CITY_THEME_COLORS.textMuted,
     fontWeight: '600',
+  },
+  markerContainer: {
+    alignItems: 'center',
+  },
+  photoPointer: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderTopWidth: 10,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    marginTop: -2,
+  },
+  textPointer: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 4,
+    borderRightWidth: 4,
+    borderTopWidth: 8,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    marginTop: -2,
   },
   clusterContainer: {
     width: CITY_PIN_SIZE.cluster,

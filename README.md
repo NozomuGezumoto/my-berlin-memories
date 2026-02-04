@@ -76,19 +76,48 @@ Use one of the following:
 
 ## Building for Production
 
+### EAS Build Profiles
+
+Each city has its own EAS build profile configured in `eas.json`. This allows each city app to be built and submitted separately to App Store Connect and Google Play Console.
+
+**Current EAS Projects:**
+- **My Kyoto**: Project ID `be8cf4b8-2805-49b0-bf67-c791a8dfcf52` (already in review)
+- **My Paris**: Project ID `01360b68-1eb7-40be-b344-40a2e69a8522` (separate project)
+
 ### Build for a specific city
 
 ```bash
-# Build Kyoto version
-npm run build:kyoto
+# Build using EAS profiles (recommended)
+npm run build:kyoto   # Builds My Kyoto app
+npm run build:paris   # Builds My Paris app
 
-# Build Paris version
-npm run build:paris
-
-# etc...
+# Or use EAS CLI directly
+eas build --profile kyoto -p ios
+eas build --profile paris -p ios
 ```
 
-### Manual build with custom city
+Each city builds as a separate app with unique bundle identifiers:
+- My Kyoto: `com.mycity.mykyoto`
+- My Paris: `com.mycity.myparis`
+
+### App Store Connect / Google Play Console
+
+Each city version is configured as a separate app:
+- Different bundle IDs / package names
+- Separate EAS project IDs
+- Independent versioning and submissions
+
+**To submit to App Store Connect:**
+```bash
+eas submit --profile paris -p ios
+```
+
+**To submit to Google Play Console:**
+```bash
+eas submit --profile paris -p android
+```
+
+### Manual build with custom city (development only)
 
 ```bash
 # On macOS/Linux
@@ -173,9 +202,31 @@ const CITY_APP_CONFIG = {
 {
   "scripts": {
     "start:newcity": "cross-env CITY=newcity expo start",
-    "build:newcity": "cross-env CITY=newcity eas build"
+    "build:newcity": "eas build --profile newcity"
   }
 }
+```
+
+5. Add EAS build profile to `eas.json`:
+
+```json
+{
+  "build": {
+    "newcity": {
+      "extends": "production",
+      "env": {
+        "CITY": "newcity"
+      }
+    }
+  }
+}
+```
+
+6. Get EAS project ID and add to `app.config.js`:
+
+```bash
+CITY=newcity eas init
+# Then add the project ID to CITY_EAS_PROJECT_IDS in app.config.js
 ```
 
 ## Design Philosophy
